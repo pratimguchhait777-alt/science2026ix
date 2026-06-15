@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SCIENCE_IX | Pro-Guard Sync Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&family=Space+Grotesk:wght=500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --pw-primary: #070a13; 
+            --pw-accent: #6366f1;  
+            --pw-accent-glow: rgba(99, 102, 241, 0.4);
+            --pw-bg: #030712;      
+            --pw-card: rgba(17, 24, 39, 0.7);    
+            --text-main: #f8fafc;  
+            --text-muted: #94a3b8; 
+            --pw-green: #10b981;  
+            --pw-purple: #8b5cf6;
+            --pw-red: #ef4444;
+            --pw-border: rgba(255, 255, 255, 0.08); 
+            
+            /* High-Intensity Neon Specs */
+            --neon-blue: #00f2fe;
+            --neon-glow: rgba(0, 242, 254, 0.25);
+            
+            /* Aesthetic Theme Adjustments */
+            --dark-blue-line: #1e293b;
+            --folder-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--pw-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Ambient Background Glows */
+        .bg-glow-1 {
+            position: fixed; top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            z-index: -1; pointer-events: none;
+        }
+        .bg-glow-2 {
+            position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            z-index: -1; pointer-events: none;
+        }
+
+        #particle-canvas, #celebration-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        @keyframes folderFloat {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-5px) scale(1.01); box-shadow: 0 10px 25px var(--folder-glow); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+
+        @keyframes noticePulse {
+            0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.1), inset 0 0 10px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.3), inset 0 0 15px rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.6); }
+            100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.1), inset 0 0 10px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.3); }
+        }
+
+        /* --- GLOWING BUTTON ANIMATION --- */
+        @keyframes glowingTriggerButton {
+            0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.5), 0 0 30px rgba(99, 102, 241, 0.3); border-color: #00f2fe; }
+            50% { box-shadow: 0 0 30px rgba(0, 242, 254, 0.9), 0 0 45px rgba(99, 102, 241, 0.6); border-color: #ffffff; }
+            100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.5), 0 0 30px rgba(99, 102, 241, 0.3); border-color: #00f2fe; }
+        }
+
+        /* --- GLOWING GLASSES ANIMATION --- */
+        @keyframes pulsingGlasses {
+            0% { box-shadow: 0 0 4px var(--neon-blue); border-color: #00f2fe; filter: drop-shadow(0 0 2px #00f2fe); }
+            50% { box-shadow: 0 0 14px #fff, 0 0 20px var(--neon-blue); border-color: #fff; filter: drop-shadow(0 0 6px #00f2fe); }
+            100% { box-shadow: 0 0 4px var(--neon-blue); border-color: #00f2fe; filter: drop-shadow(0 0 2px #00f2fe); }
+        }
+
+        /* --- DYNAMIC STREAK FIRE ANIMATION --- */
+        @keyframes firePulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px #ef4444) brightness(1); }
+            50% { transform: scale(1.23) translateY(-2px); filter: drop-shadow(0 0 10px #f97316) brightness(1.3); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px #ef4444) brightness(1); }
+        }
+        .animated-fire {
+            display: inline-block;
+            animation: firePulse 0.8s ease-in-out infinite;
+        }
+
+        /* --- CHAT MESSAGE TYPING CURSOR MOTION EFFECT --- */
+        .typing-cursor::after {
+            content: '▋';
+            animation: blinkCursor 0.6s infinite;
+            color: var(--neon-blue);
+            margin-left: 2px;
+        }
+        @keyframes blinkCursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* --- COOL ANIMATED TOAST NOTIFICATION STYLING --- */
+        #notification-toast-container {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 5000;
+            display: flex; flex-direction: column; gap: 12px; width: 92%; max-width: 360px;
+        }
+
+        @keyframes toastIn {
+            0% { opacity: 0; transform: translateY(30px) scale(0.9); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes toastOut {
+            0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            100% { opacity: 0; transform: translateY(20px) scale(0.95); filter: blur(4px); }
+        }
+
+        .toast-card {
+            background: rgba(15, 23, 42, 0.95); border: 1px solid var(--pw-accent);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.3), 0 0 20px rgba(0, 242, 254, 0.1); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 14px 18px; border-radius: 12px; color: #fff; display: flex;
+            flex-direction: column; gap: 4px; border-left: 4px solid var(--neon-blue);
+            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .toast-card.hide {
+            animation: toastOut 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+        }
+
+        .toast-header { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 800; color: var(--neon-blue); letter-spacing: 0.5px; text-transform: uppercase; }
+        .toast-body { font-size: 0.85rem; color: #f1f5f9; line-height: 1.4; font-weight: 500; }
+
+        header {
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--pw-border);
+            padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
+        }
+        
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 900; letter-spacing: -0.8px; }
+        .logo span { color: var(--pw-accent); }
+
+        .header-utility-grid {
+            display: grid; grid-template-columns: 1fr auto auto auto auto; align-items: center; gap: 6px; width: 100%;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--pw-border); padding: 4px 6px; border-radius: 12px;
+        }
+        
+        #welcome-user { font-weight: 700; color: #fff; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 4px; }
+        .xp-badge { background: linear-gradient(135deg, var(--pw-accent), #4f46e5); color: #fff; padding: 5px 8px; border-radius: 8px; font-weight: 800; font-size: 0.72rem; display: flex; align-items: center; gap: 3px; height: 28px; }
+        .streak-badge { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; padding: 5px 8px; border-radius: 8px; font-weight: 800; font-size: 0.72rem; display: flex; align-items: center; gap: 3px; height: 28px; }
+        .admin-badge { background: linear-gradient(135deg, var(--pw-green), #059669); color: #fff; padding: 5px 8px; border-radius: 8px; font-weight: 800; font-size: 0.72rem; display: none; height: 28px; align-items: center; }
+        .sync-indicator { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.15); color: var(--pw-red); height: 24px; display: inline-flex; align-items: center; gap: 4px; }
+        .sync-indicator span { width: 5px; height: 5px; background: var(--pw-red); border-radius: 50%; }
+        .sync-connected { background: rgba(16, 185, 129, 0.1) !important; border-color: rgba(16, 185, 129, 0.15) !important; color: var(--pw-green) !important; }
+        .sync-connected span { background: var(--pw-green) !important; }
+
+        @media (min-width: 600px) {
+            header { flex-direction: row; justify-content: space-between; align-items: center; padding: 14px 24px; gap: 20px; }
+            .header-top-row { width: auto; }
+            .header-utility-grid { width: auto; display: flex; gap: 10px; background: transparent; border: none; padding: 0; }
+        }
+
+        .bell-container { position: relative; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.6); border: 1.5px solid var(--neon-blue); box-shadow: 0 0 6px var(--neon-glow); border-radius: 8px; }
+        .bell-svg { width: 15px; height: 15px; fill: var(--neon-blue); }
+        .bell-dot { position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; background-color: var(--pw-red); border-radius: 50%; display: none; border: 1px solid #fff; }
+
+        /* --- CLASSROOM ROSTER & VISIBLE PERFORMANCE PANELS --- */
+        .dashboard-roster-section { max-width: 1200px; margin: 12px auto; padding: 0 12px; display: none; }
+        #classroom-performance-board { background: rgba(15, 23, 42, 0.65); border: 1px solid var(--pw-border); border-radius: 14px; padding: 16px; margin-bottom: 12px; backdrop-filter: blur(10px); }
+        .performance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 10px; }
+        .performance-student-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; position: relative; display: flex; flex-direction: column; gap: 4px; border-left: 3px solid var(--pw-accent); }
+        .performance-student-card.is-admin-card { border-left-color: var(--pw-green); background: rgba(16, 185, 129, 0.02); }
+
+        /* --- AUTO-SLIDER STRUCTURE --- */
+        .guide-slider-wrapper {
+            margin: 16px 0 24px 0; position: relative; overflow: hidden;
+            border-bottom: 1px solid var(--dark-blue-line); padding-bottom: 16px;
+        }
+        .guide-slides-container { display: flex; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); width: 600%; }
+        .guide-slide { width: 100%; padding: 0 4px; }
+        .guide-grid-layout { display: grid; grid-template-columns: 1fr; gap: 8px; background: transparent; }
+        .guide-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--neon-blue); margin-bottom: 4px; letter-spacing: -0.3px; }
+        .guide-text { font-size: 0.88rem; line-height: 1.5; color: var(--text-muted); }
+        .guide-text strong { color: var(--text-main); }
+        .slider-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 0 4px; }
+        .slider-btn { background: transparent; border: 1px solid var(--dark-blue-line); color: var(--text-main); padding: 6px 14px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .slider-btn:active { border-color: var(--pw-accent); color: var(--pw-accent); }
+        .slider-dots { display: flex; gap: 6px; }
+        .dot { width: 6px; height: 6px; background: var(--dark-blue-line); border-radius: 50%; transition: all 0.2s; }
+        .dot.active { background: var(--pw-accent); transform: scale(1.2); }
+
+        /* --- LOGIN PORTAL --- */
+        #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #02040a; display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .welcome-box { text-align: center; padding: 28px 16px; border-radius: 16px; background: rgba(10, 15, 30, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); width: 92%; max-width: 350px; backdrop-filter: blur(24px); }
+        .welcome-box h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -1.2px; }
+        .welcome-box h1 span { color: var(--pw-accent); }
+        .welcome-box p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.8rem; }
+        .welcome-box input { padding: 12px; font-size: 0.9rem; border: 1px solid var(--pw-border); border-radius: 10px; background: rgba(255,255,255,0.02); color: #fff; text-align: center; width: 100%; margin-bottom: 14px; }
+        .welcome-box button { padding: 12px; background: linear-gradient(135deg, var(--pw-accent), #4f46e5); color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; }
+
+        .container { max-width: 1200px; margin: 10px auto; padding: 0 12px; }
+
+        /* --- SUBJECT CONTAINER --- */
+        .subject-table-view { width: 100%; border-collapse: collapse; margin-top: 14px; animation: slideUpFade 0.4s ease; }
+        .subject-table-view tr { border-bottom: 1.5px solid var(--dark-blue-line); cursor: pointer; }
+        .subject-table-view td { padding: 16px 8px; vertical-align: middle; background: transparent; }
+        
+        .subject-icon-box { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; }
+        .sc-phy .subject-icon-box { background: rgba(0, 242, 254, 0.06); color: #00f2fe; }
+        .sc-chem .subject-icon-box { background: rgba(16, 185, 129, 0.06); color: #34d399; }
+        .sc-bio .subject-icon-box { background: rgba(236, 72, 153, 0.06); color: #f472b6; }
+        .sc-math .subject-icon-box { background: rgba(139, 92, 246, 0.06); color: #a78bfa; }
+        
+        .subject-name { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+        .progress-text { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-align: right; }
+
+        /* --- DIRECTORY FOLDERS --- */
+        .directory-view { display: none; animation: slideUpFade 0.3s ease; }
+        .back-btn { background: rgba(255,255,255,0.03); color: #fff; border: 1px solid var(--pw-border); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; margin-bottom: 14px; }
+        .directory-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .directory-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 900; }
+        .btn-create-chapter { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--pw-accent); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; display: none; }
+        
+        .chapter-list { display: flex; flex-direction: column; gap: 10px; }
+        .chapter-row { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--pw-border); border-radius: 12px; overflow: hidden; animation: folderFloat 4s ease-in-out infinite; }
+        .chapter-trigger { padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .chapter-label { font-size: 0.65rem; font-weight: 800; color: #818cf8; text-transform: uppercase; background: rgba(99, 102, 241, 0.12); padding: 2px 5px; border-radius: 4px; }
+        .chapter-title-text { font-size: 0.95rem; font-weight: 700; color: #fff; }
+        .chapter-counters { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .btn-delete-chapter { background: rgba(239, 68, 68, 0.15); border: none; color: #fca5a5; padding: 4px 8px; border-radius: 5px; font-size: 0.65rem; display: none; }
+        .chevron-down { color: #475569; transition: transform 0.2s; }
+        .chapter-row.active .chevron-down { transform: rotate(180deg); color: #fff; }
+
+        .chapter-content-pool { display: none; padding: 12px; background: #090d16; border-top: 1px solid var(--pw-border); }
+        .chapter-row.active .chapter-content-pool { display: block; }
+        .sub-slots-container { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 1000px) { .sub-slots-container { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+        
+        .inner-bucket { background: rgba(10, 15, 30, 0.4); border-radius: 10px; padding: 12px; border: 1px solid var(--pw-border); display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; }
+        .inner-bucket h4 { font-size: 0.8rem; font-weight: 800; color: #fff; margin-bottom: 8px; border-bottom: 1px solid var(--pw-border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .content-list { list-style: none; margin-bottom: 8px; }
+        .content-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.01); padding: 8px; border-radius: 8px; margin-bottom: 6px; font-size: 0.78rem; border: 1px solid var(--pw-border); color: #e2e8f0; }
+        
+        .btn-view { background: rgba(255, 255, 255, 0.04); color: #fff; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.7gram; border: 1px solid rgba(255,255,255,0.08); font-weight: 700; }
+
+        .admin-upload-panel { display: none; margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+        .native-pdf-label { display: block; background: rgba(99, 102, 241, 0.03); color: #a5b4fc; padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 0.7rem; font-weight: 700; border: 1px dashed rgba(99, 102, 241, 0.4); text-align: center; }
+
+        /* --- ASSESSMENT SYSTEM VIEWS & PROGUARD TIMER --- */
+        #quiz-portal-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #030712; display: none; flex-direction: column; z-index: 3000; padding: 20px; overflow-y: auto; }
+        .quiz-container { max-width: 600px; margin: 40px auto; width: 100%; }
+        
+        #security-timer-banner {
+            position: sticky; top: 0; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px; padding: 10px; text-align: center; font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 0.9rem; color: #fca5a5; display: none; margin-bottom: 16px;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.1); backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        .question-card { background: rgba(17, 24, 39, 0.7); border: 1px solid var(--pw-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .options-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .option-button { background: rgba(255,255,255,0.02); border: 1px solid var(--pw-border); padding: 12px; text-align: left; color: #fff; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        .option-button.selected { border-color: var(--pw-accent); background: rgba(99, 102, 241, 0.1); }
+
+        .attached-input-group { position: relative; display: flex; align-items: center; width: 100%; margin-bottom: 14px; }
+        .attached-input-group input { margin-bottom: 0 !important; padding-right: 48px !important; }
+
+        /* --- NOTICE & MODAL OVERLAYS --- */
+        #notice-overlay-modal, #leaderboard-overlay-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 4, 8, 0.85); display: none; justify-content: center; align-items: center; z-index: 4500; backdrop-filter: blur(20px); }
+        .notice-board-box { width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(10, 15, 30, 0.98), rgba(3, 7, 18, 0.98)); border-radius: 20px; padding: 24px; border: 2px solid rgba(0, 242, 254, 0.3); text-align: center; animation: noticePulse 4s infinite linear; }
+        .notice-board-content { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; color: #e2e8f0; font-size: 0.9rem; text-align: left; margin-bottom: 20px; max-height: 200px; overflow-y: auto; }
+        .btn-edit-notice { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; display: none; }
+
+        #viewer-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 5, 10, 0.95); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(20px); }
+        .modal-content { width: 100%; height: 100%; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+        .close-modal { position: absolute; top: 10px; right: 10px; color: #fff; font-size: 0.7rem; cursor: pointer; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; z-index: 2100; }
+        #view-frame { width: 100%; height: 100%; border: none; background: #0b0f19; padding-top: 50px; }
+
+        #custom-dialog-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 4, 8, 0.85); display: none; justify-content: center; align-items: center; z-index: 4000; backdrop-filter: blur(20px); }
+        .dialog-box { width: 100%; max-width: 340px; background: rgba(15, 23, 42, 0.95); border-radius: 14px; padding: 18px; border: 1px solid var(--pw-border); text-align: center; color: #fff; }
+        .dialog-box input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--pw-border); background: rgba(255,255,255,0.03); color: #fff; outline: none; margin-bottom: 14px; text-align: center; }
+        .dialog-actions { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+        .btn-dialog-primary { background: var(--pw-accent); color: #fff; padding: 8px 14px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
+        .btn-dialog-secondary { background: rgba(255, 255, 255, 0.05); color: #fff; padding: 8px 14px; border: 1px solid var(--pw-border); border-radius: 6px; font-weight: 700; cursor: pointer; }
+
+        /* --- PREMIUM HARMONIZED GLOWING CORE DESIGN --- */
+        #prai-avatar-trigger {
+            position: fixed; bottom: 20px; right: 20px; width: 74px; height: 74px;
+            background: linear-gradient(135deg, #090d16, #1e1b4b);
+            border: 2.5px solid var(--neon-blue);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 4800; overflow: visible;
+            animation: glowingTriggerButton 3s ease-in-out infinite;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #prai-avatar-trigger:hover { transform: scale(1.1) rotate(5deg); }
+        
+        /* Modernized Core SVG Atom Frame Architecture */
+        .handsome-boy { position: relative; width: 62px; height: 62px; display: flex; align-items: center; justify-content: center; }
+        .prai-atom-svg { width: 85%; height: 85%; filter: drop-shadow(0 0 4px var(--neon-blue)); }
+
+        /* Glowing Spectacles overlay layer sitting right over the vector geometry architecture */
+        .boy-eyes-glasses { position: absolute; top: 22px; display: flex; gap: 4px; z-index: 10; pointer-events: none; }
+        .glass-frame { 
+            width: 14px; height: 11px; border: 2px solid #00f2fe; 
+            background: rgba(0, 242, 254, 0.25); border-radius: 4px; position: relative; 
+            animation: pulsingGlasses 3s ease-in-out infinite;
+        }
+        .glass-frame::after { content: ''; position: absolute; top: 1px; left: 1px; width: 3px; height: 2px; background: #fff; transform: skewX(-20deg); }
+        .glass-bridge-node { width: 4px; height: 2px; background: #00f2fe; align-self: center; animation: pulsingGlasses 3s ease-in-out infinite; }
+
+        /* Dynamic Pop-up Speech Bubble Layout Component */
+        #prai-speech-popup-bubble {
+            position: fixed; bottom: 106px; right: 25px; background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            border: 2px solid var(--neon-blue); box-shadow: 0 10px 30px rgba(0, 242, 254, 0.5);
+            border-radius: 14px; padding: 12px 16px; width: 250px; color: #fff; font-size: 0.78rem;
+            font-weight: 800; font-family: 'Space Grotesk', sans-serif; text-transform: uppercase;
+            letter-spacing: 0.2px; text-align: center; z-index: 4790; display: block;
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 1; transform: translateY(0);
+        }
+        #prai-speech-popup-bubble.hidden-pop {
+            opacity: 0; transform: translateY(15px) scale(0.9); pointer-events: none;
+        }
+        #prai-speech-popup-bubble::after {
+            content: ''; position: absolute; bottom: -10px; right: 26px; width: 0; height: 0;
+            border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid var(--neon-blue);
+        }
+
+        /* Intelligent AI Chat Workspace Window Drawer Block */
+        #prai-chat-drawer {
+            position: fixed; bottom: 20px; right: 20px; width: 92%; max-width: 370px;
+            height: 520px; max-height: 82vh; background: rgba(9, 13, 26, 0.98);
+            border: 2px solid var(--neon-blue); box-shadow: 0 20px 50px rgba(0, 242, 254, 0.3);
+            border-radius: 20px; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            display: none; flex-direction: column; z-index: 4900; overflow: hidden;
+            transform-origin: bottom right; animation: toastIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+        }
+        #prai-chat-drawer.hide { animation: toastOut 0.25s ease forwards; }
+        
+        .prai-chat-header {
+            background: linear-gradient(90deg, #1e1b4b, #0f172a);
+            padding: 14px 18px; border-bottom: 1px solid var(--pw-border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .prai-chat-feed { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        
+        /* Inside chat messages are clean, beautiful and optimized for motion delivery */
+        .prai-msg { max-width: 85%; padding: 12px 16px; border-radius: 14px; font-size: 0.86rem; line-height: 1.45; font-weight: 500; box-shadow: none !important; border: none !important; word-wrap: break-word; }
+        .prai-msg.ai { background: rgba(255, 255, 255, 0.06); color: #f1f5f9; align-self: flex-start; border-left: 3px solid var(--neon-blue) !important; }
+        .prai-msg.user { background: #4f46e5; color: #ffffff; align-self: flex-end; }
+        
+        .prai-chat-footer { padding: 12px; border-top: 1px solid var(--pw-border); background: #060913; display: flex; gap: 8px; }
+        .prai-chat-footer input { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--pw-border); color: #fff; padding: 12px; border-radius: 10px; font-size: 0.85rem; outline: none; }
+        .prai-chat-footer input:focus { border-color: var(--neon-blue); }
+        .prai-chat-footer button { background: linear-gradient(135deg, var(--neon-blue), var(--pw-accent)); border: none; color: #fff; padding: 0 16px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.85rem; text-transform: uppercase; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <canvas id="particle-canvas"></canvas>
+    <canvas id="celebration-canvas"></canvas>
+    <div class="bg-glow-1"></div><div class="bg-glow-2"></div>
+    <div id="notification-toast-container"></div>
+
+    <div id="welcome-screen">
+        <div class="welcome-box">
+            <h1>SCIENCE_<span>IX</span></h1>
+            <p>Sign in to access your batch classroom</p>
+            <input type="text" id="username-input" placeholder="Enter Student Name / ID" autocomplete="off"><br>
+            <button id="auth-submit-btn" onclick="entrySetup()">Let's Study</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-top-row">
+            <div class="logo">SCIENCE_<span>IX</span></div>
+            <span id="sync-status" class="sync-indicator"><span></span> Syncing</span>
+        </div>
+        
+        <div class="header-utility-grid">
+            <span id="welcome-user">Loading Profile...</span>
+            <div id="admin-indicator" class="admin-badge">Admin</div>
+            <div class="bell-container" id="notice-bell" onclick="openNoticeModal()">
+                <svg class="bell-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1-1.5-1s-1.5.17-1.5 1v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                <div class="bell-dot" id="notice-unread-dot"></div>
+            </div>
+            <div id="streak-badge-wrapper" class="streak-badge"><span class="animated-fire">🔥</span> <span id="streak-count">1</span></div>
+            <div id="xp-badge-wrapper" class="xp-badge">✨ <span id="xp-count">0</span> XP</div>
+        </div>
+    </header>
+
+    <div class="dashboard-roster-section" id="roster-section-container">
+        <div id="classroom-performance-board">
+            <h3 style="font-family:'Space Grotesk', sans-serif; font-size:0.95rem; color:#fff; display:flex; align-items:center; gap:6px;">📊 Classroom Live Performance Board</h3>
+            <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:8px;">Real-time engagement tracking across all profiles</p>
+            <div class="performance-grid" id="global-performance-grid-target"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <div class="guide-slider-wrapper" id="guide-slider-block">
+            <div class="guide-slides-container" id="slides-track">
+                <div class="guide-slide"><div class="guide-grid-layout"><div class="guide-title">🌍 Portal Overview</div><div class="guide-text">Welcome to <strong>SCIENCE_IX</strong>, your real-time cloud classroom workspace.</div></div></div>
+                <div class="guide-slide"><div class="guide-grid-layout"><div class="guide-title">🛡️ ProGuard Anti-Cheat</div><div class="guide-text">DPPs and Monthly Tests are heavily secure. Leaving the exam view or switching tabs will <strong>instantly cancel your test</strong> and lock your profile out permanently.</div></div></div>
+                <div class="guide-slide"><div class="guide-grid-layout"><div class="guide-title">📢 Notice Board</div><div class="guide-text">Tap the active <strong>Neon Bell Icon</strong> located in the utility panel to see notifications.</div></div></div>
+                <div class="guide-slide"><div class="guide-grid-layout"><div class="guide-title">📝 Accessing DPPs</div><div class="guide-text">Select your target subject row below, extend a chapter folder drop-down, and tap <strong>"Open"</strong> inside the designated Practice Papers section.</div></div></div>
+                <div class="guide-slide"><div class="guide-grid-layout"><div class="guide-title">🏆 Monthly Tests</div><div class="guide-text">Official monthly performance tests propagate directly into your folder slots view. All attempts are timed.</div></div></div>
+                <div class="guide-slide"><div class="guide-grid-layout"><div class="guide-title">🏆 Class Notes</div><div class="guide-text">Class notes are filed natively inside chapter dropdown directories.</div></div></div>
+            </div>
+            <div class="slider-controls">
+                <button class="slider-btn" onclick="manualShiftSlide(-1)">← Prev</button>
+                <div class="slider-dots" id="dots-indicator-block">
+                    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <button class="slider-btn" onclick="manualShiftSlide(1)">Next →</button>
+            </div>
+        </div>
+        
+        <table id="subject-hub-view" class="subject-table-view">
+            <tr class="sc-phy" onclick="openSubjectDirectory('phy')"><td><div class="subject-icon-box">Ph</div></td><td><span class="subject-name">Physics</span></td><td><div class="progress-text">📂 <span id="count-phy">0</span> Ch</div></td></tr>
+            <tr class="sc-chem" onclick="openSubjectDirectory('chem')"><td><div class="subject-icon-box">Ch</div></td><td><span class="subject-name">Chemistry</span></td><td><div class="progress-text">📂 <span id="count-chem">0</span> Ch</div></td></tr>
+            <tr class="sc-bio" onclick="openSubjectDirectory('bio')"><td><div class="subject-icon-box">Bi</div></td><td><span class="subject-name">Biology</span></td><td><div class="progress-text">📂 <span id="count-bio">0</span> Ch</div></td></tr>
+            <tr class="sc-math" onclick="openSubjectDirectory('math')"><td><div class="subject-icon-box">Ma</div></td><td><span class="subject-name">Mathematics</span></td><td><div class="progress-text">📂 <span id="count-math">0</span> Ch</div></td></tr>
+        </table>
+
+        <div id="directory-view" class="directory-view">
+            <button class="back-btn" onclick="closeSubjectDirectory()">← Back</button>
+            <div class="directory-header">
+                <h2 class="directory-title" id="directory-title-text">Workspace</h2>
+                <button class="btn-create-chapter" id="btn-add-chapter" onclick="handleCreateChapterClick()">+ New Chapter</button>
+            </div>
+            <div class="chapter-list" id="chapter-list-target"></div>
+        </div>
+    </div>
+
+    <div id="quiz-portal-modal">
+        <div class="quiz-container">
+            <div id="security-timer-banner">⚠️ PROGUARD BLOCK ACTIVE: DO NOT SWITCH TABS | REMAINING TIME: <span id="timer-countdown-clock">00:00</span></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 id="quiz-portal-title" style="font-family:'Space Grotesk', sans-serif;">Assessment</h2>
+                <button class="back-btn" id="btn-exit-quiz-portal" style="margin-bottom:0;" onclick="closeQuizPortal()">Exit Board</button>
+            </div>
+            <div id="quiz-questions-loader-target"></div>
+        </div>
+    </div>
+
+    <div id="prai-speech-popup-bubble" onclick="togglePraiChatDrawer()">
+        HI I AM PR(AI) I AM HERE TO DESTROY YOUR DOUBTS🔥
+    </div>
+
+    <div id="prai-avatar-trigger" onclick="togglePraiChatDrawer()">
+        <div class="handsome-boy">
+            <svg class="prai-atom-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="8" fill="#00f2fe"/>
+                <ellipse cx="50" cy="50" rx="38" ry="12" stroke="#6366f1" stroke-width="2.5" transform="rotate(30 50 50)"/>
+                <ellipse cx="50" cy="50" rx="38" ry="12" stroke="#00f2fe" stroke-width="2.5" transform="rotate(90 50 50)"/>
+                <ellipse cx="50" cy="50" rx="38" ry="12" stroke="#8b5cf6" stroke-width="2.5" transform="rotate(150 50 50)"/>
+            </svg>
+            <div class="boy-eyes-glasses">
+                <div class="glass-frame"></div>
+                <div class="glass-bridge-node"></div>
+                <div class="glass-frame"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="prai-chat-drawer">
+        <div class="prai-chat-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="handsome-boy" style="transform: scale(0.55); width:32px; height:32px;">
+                    <svg class="prai-atom-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="8" fill="#00f2fe"/>
+                        <ellipse cx="50" cy="50" rx="38" ry="12" stroke="#6366f1" stroke-width="2.5" transform="rotate(30 50 50)"/>
+                        <ellipse cx="50" cy="50" rx="38" ry="12" stroke="#00f2fe" stroke-width="2.5" transform="rotate(90 50 50)"/>
+                        <ellipse cx="50" cy="50" rx="38" ry="12" stroke="#8b5cf6" stroke-width="2.5" transform="rotate(150 50 50)"/>
+                    </svg>
+                </div>
+                <span style="font-family:'Space Grotesk', sans-serif; font-weight:900; font-size:1rem; color:#00f2fe; letter-spacing:0.4px;">PR(AI) CORE HUB</span>
+            </div>
+            <span style="cursor:pointer; font-size:1rem; color:var(--text-muted); font-weight:bold;" onclick="togglePraiChatDrawer()">✕</span>
+        </div>
+        <div class="prai-chat-feed" id="prai-msg-feed-target">
+            <div class="prai-msg ai">Hello Bacchoo! Welcome to PR(AI) Core Hub—your personal academic mentor, built exactly like your favorite PW AI Guru! 📚✨ Ask me anything about Physics, Chemistry, Biology, or Math. Let's solve your doubts step-by-step and achieve full marks! What are we studying today? 🔥</div>
+        </div>
+        <div class="prai-chat-footer">
+            <input type="text" id="prai-input-box" placeholder="Ask a science doubt or study question..." autocomplete="off" onkeydown="if(event.key==='Enter') dispatchPraiUserMessage()">
+            <button onclick="dispatchPraiUserMessage()">Ask</button>
+        </div>
+    </div>
+
+    <div id="notice-overlay-modal">
+        <div class="notice-board-box">
+            <h3>📌 Classroom Notice Board</h3>
+            <div id="announcement-display" class="notice-board-content">Loading announcement data...</div>
+            <div class="notice-board-actions">
+                <button id="btn-edit-notice" class="btn-edit-notice" onclick="handleModifyAnnouncement()">✏️ Update</button>
+                <button class="btn-dialog-primary" onclick="closeNoticeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboard-overlay-modal">
+        <div class="notice-board-box" style="border-color: var(--pw-purple);">
+            <h3 id="leaderboard-modal-title">📊 Module Leaderboard</h3>
+            <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Active completion submissions for this assignment block</p>
+            <div id="leaderboard-modal-content" class="notice-board-content" style="max-height: 250px;">Loading live roster stats...</div>
+            <div class="notice-board-actions">
+                <button class="btn-dialog-primary" onclick="closeLeaderboardModal()">Close View</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewer-modal"><div class="modal-content"><span class="close-modal" onclick="closeViewer()">✕ Close</span><iframe id="view-frame" src=""></iframe></div></div>
+    <div id="custom-dialog-modal"><div class="dialog-box" id="dialog-box-content"></div></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs79VbT889T-Ouy_Y-1wREx86u8o_L6ks",
+            authDomain: "science-ix-87252.firebaseapp.com",
+            projectId: "science-ix-87252",
+            storageBucket: "science-ix-87252.appspot.com",
+            messagingSenderId: "364508216393",
+            appId: "1:364508216393:web:bda878bc90069cb23214da"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let activeUser = localStorage.getItem('science_ix_session');
+        let currentXP = 0;
+        let userStreak = 1;
+        let readLog = [];
+        let solvedQuestionsLog = {}; 
+        let selectedSubjectCode = "";
+        let initialNotificationsLoadCompleted = false;
+        let lastSeenNoticeText = localStorage.getItem('science_ix_last_notice') || "";
+        let isTypingActive = false;
+        
+        let targetQuizChapterIndex = null;
+        let targetQuizBucketKey = null; 
+        let targetQuizModuleId = null;
+
+        let examActiveState = false;
+        let proGuardCountdownInterval = null;
+        let timeRemainingSeconds = 0;
+
+        let activeSlideIndex = 0;
+        const completeSlidesCount = 6;
+        let autoSlideTimer = null;
+
+        function shiftSlide(direction) {
+            activeSlideIndex += direction;
+            if (activeSlideIndex < 0) activeSlideIndex = completeSlidesCount - 1;
+            if (activeSlideIndex >= completeSlidesCount) activeSlideIndex = 0;
+            const track = document.getElementById('slides-track');
+            if (track) track.style.transform = `translateX(-${(activeSlideIndex * 100) / completeSlidesCount}%)`;
+            const dots = document.getElementById('dots-indicator-block').children;
+            for (let i = 0; i < dots.length; i++) { dots[i].classList.toggle('active', i === activeSlideIndex); }
+        }
+
+        function manualShiftSlide(direction) {
+            clearInterval(autoSlideTimer); 
+            shiftSlide(direction);
+            initiateAutoSliderLoop(); 
+        }
+
+        function initiateAutoSliderLoop() {
+            autoSlideTimer = setInterval(() => {
+                shiftSlide(1);
+            }, 4000); 
+        }
+
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; 
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.2 + 0.8; 
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * -0.5 - 0.2; 
+                this.opacity = Math.random() * 0.5 + 0.2;
+                const colorPalette = [`rgba(0, 242, 254, ${this.opacity})`, `rgba(99, 102, 241, ${this.opacity})`, `rgba(139, 92, 246, ${this.opacity})`];
+                this.color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            }
+            update() { 
+                this.x += this.speedX; this.y += this.speedY; 
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1; 
+                if (this.y < -10) { this.y = canvas.height + 10; this.x = Math.random() * canvas.width; }
+            }
+            draw() { 
+                ctx.save(); ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+        }
+        for (let i = 30; i >= 0; i--) particles.push(new Particle());
+        function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+        animateParticles();
+
+        function listenToLiveNotificationFeed() {
+            db.collection('notifications').orderBy('timestamp', 'desc').limit(5).onSnapshot(snapshot => {
+                if (!initialNotificationsLoadCompleted) { initialNotificationsLoadCompleted = true; return; }
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added" && activeUser && activeUser.toUpperCase() !== "PRATIM") { spawnNotificationToast(change.doc.data().text); }
+                });
+            });
+        }
+
+        function spawnNotificationToast(message) {
+            const container = document.getElementById('notification-toast-container');
+            const toast = document.createElement('div'); toast.className = 'toast-card';
+            toast.innerHTML = `<div class="toast-header">🔔 Sync Update</div><div class="toast-body">${message}</div>`;
+            container.appendChild(toast); 
+            setTimeout(() => { toast.classList.add('hide'); setTimeout(() => { toast.remove(); }, 300); }, 4700);
+        }
+
+        function listenToGlobalAnnouncements() {
+            db.collection('curriculum').doc('billboard_announcement').onSnapshot(doc => {
+                if (doc.exists) {
+                    const currentNotice = doc.data().message;
+                    document.getElementById('announcement-display').innerText = currentNotice;
+                    if (currentNotice !== lastSeenNoticeText) { document.getElementById('notice-unread-dot').style.display = 'block'; }
+                }
+            });
+        }
+
+        function openNoticeModal() { registerStatePushHistory('notice'); document.getElementById('notice-overlay-modal').style.display = 'flex'; document.getElementById('notice-unread-dot').style.display = 'none'; }
+        function closeNoticeModal() { document.getElementById('notice-overlay-modal').style.display = 'none'; }
+        function handleModifyAnnouncement() { showCustomPrompt("Update Notice", "Type text content here:", (newNotice) => { db.collection('curriculum').doc('billboard_announcement').set({ message: newNotice, updatedBy: activeUser, date: new Date().toLocaleDateString() }); }); }
+
+        function showCustomPrompt(title, placeholder, onConfirm) {
+            const modal = document.getElementById('custom-dialog-modal'); const target = document.getElementById('dialog-box-content');
+            target.innerHTML = `<h3>${title}</h3><input type="text" id="custom-prompt-input" placeholder="${placeholder}" autocomplete="off"><div class="dialog-actions"><button class="btn-dialog-secondary" onclick="closeCustomDialog()">Cancel</button><button class="btn-dialog-primary" id="btn-dialog-confirm">Submit</button></div>`;
+            modal.style.display = 'flex';
+            document.getElementById('btn-dialog-confirm').onclick = () => { const val = document.getElementById('custom-prompt-input').value.trim(); closeCustomDialog(); if (val) onConfirm(val); };
+        }
+        function showCustomConfirm(title, message, onConfirm) {
+            const modal = document.getElementById('custom-dialog-modal'); const target = document.getElementById('dialog-box-content');
+            target.innerHTML = `<h3>${title}</h3><p style='font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;'>${message}</p><div class="dialog-actions"><button class="btn-dialog-secondary" onclick="closeCustomDialog()">Cancel</button><button class="btn-dialog-primary" id="btn-dialog-confirm">Confirm</button></div>`;
+            modal.style.display = 'flex'; document.getElementById('btn-dialog-confirm').onclick = () => { closeCustomDialog(); onConfirm(); };
+        }
+        function showCustomAlert(title, message) {
+            const modal = document.getElementById('custom-dialog-modal'); const target = document.getElementById('dialog-box-content');
+            target.innerHTML = `<h3>${title}</h3><p style='font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;'>${message}</p><div class="dialog-actions"><button class="btn-dialog-primary" onclick="closeCustomDialog()">OK</button></div>`;
+            modal.style.display = 'flex';
+        }
+        function closeCustomDialog() { document.getElementById('custom-dialog-modal').style.display = 'none'; }
+
+        auth.signInAnonymously().catch(err => console.error(err));
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (activeUser) {
+                applyIdentityConfig(activeUser); document.getElementById('welcome-screen').style.display = 'none'; syncStudentProfileCloud(activeUser);
+            }
+            listenToGlobalCurriculum(); listenToActiveRoster(); listenToLiveNotificationFeed(); listenToGlobalAnnouncements();
+            setupProGuardTabProtection(); initiateAutoSliderLoop(); setupHardwareBackButtonEngine();
+            setupAutomaticSpeechBubbleLoop();
+        });
+
+        function entrySetup() {
+            const inputName = document.getElementById('username-input').value.trim(); if (!inputName) { showCustomAlert("Identity Verification", "Please enter your name!"); return; }
+            activeUser = inputName; localStorage.setItem('science_ix_session', inputName);
+            syncStudentProfileCloud(inputName); applyIdentityConfig(inputName); document.getElementById('welcome-screen').style.display = 'none';
+        }
+
+        function applyIdentityConfig(username) {
+            document.getElementById('welcome-user').innerText = "👤 " + username;
+            if (username.toUpperCase() === "PRATIM") {
+                document.getElementById('admin-indicator').style.display = 'inline-flex'; document.getElementById('btn-add-chapter').style.display = 'block';
+                document.getElementById('btn-edit-notice').style.display = 'inline-block'; document.getElementById('roster-section-container').style.display = 'block';
+            } else { document.getElementById('roster-section-container').style.display = 'none'; }
+        }
+
+        function syncStudentProfileCloud(username) {
+            const keyName = username.toUpperCase(); const todayStr = new Date().toDateString();
+            db.collection('students').doc(keyName).get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data(); currentXP = data.xp || 0; readLog = data.readLog || [];
+                    solvedQuestionsLog = data.solvedQuestionsLog || {}; userStreak = data.streak || 1;
+                    document.getElementById('xp-count').innerText = currentXP; document.getElementById('streak-count').innerText = userStreak;
+                } else {
+                    db.collection('students').doc(keyName).set({ name: username, xp: 0, streak: 1, lastActiveDate: todayStr, readLog: [], solvedQuestionsLog: {}, joined: new Date().toLocaleDateString() });
+                }
+            });
+        }
+
+        function listenToActiveRoster() {
+            db.collection('students').onSnapshot(snapshot => {
+                const perfGrid = document.getElementById('global-performance-grid-target'); if (!perfGrid) return; perfGrid.innerHTML = "";
+                window.globalCachedRosterSubmits = [];
+                snapshot.forEach(doc => {
+                    const profile = doc.data(); window.globalCachedRosterSubmits.push(profile);
+                    const card = document.createElement('div'); const isAdminCard = profile.name.toUpperCase() === "PRATIM";
+                    card.className = `performance-student-card ${isAdminCard ? 'is-admin-card' : ''}`;
+                    card.innerHTML = `<div style="font-weight:700; font-size:0.85rem; color:#fff; overflow:hidden; text-overflow:ellipsis;">${isAdminCard ? '👑' : '👤'} ${profile.name}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;"><span style="color:var(--neon-blue); font-size:0.72rem; font-weight:700;">✨ ${profile.xp || 0} XP</span><span style="color:#f59e0b; font-size:0.72rem; font-weight:700;">🔥 ${profile.streak || 1}</span></div>`;
+                    perfGrid.appendChild(card);
+                });
+            });
+        }
+
+        function listenToGlobalCurriculum() {
+            db.collection('curriculum').doc('nested_master_folders').onSnapshot(doc => {
+                const indicator = document.getElementById('sync-status'); indicator.className = "sync-indicator sync-connected"; indicator.innerHTML = "<span></span> Live";
+                window.latestCloudPayload = doc.exists ? doc.data() : { phy: [], chem: [], bio: [], math: [] };
+                document.getElementById('count-phy').innerText = (window.latestCloudPayload.phy || []).length;
+                document.getElementById('count-chem').innerText = (window.latestCloudPayload.chem || []).length;
+                document.getElementById('count-bio').innerText = (window.latestCloudPayload.bio || []).length;
+                document.getElementById('count-math').innerText = (window.latestCloudPayload.math || []).length;
+                if (selectedSubjectCode) { refreshDirectoryUI(); }
+            });
+        }
+
+        function openSubjectDirectory(subjectCode) {
+            selectedSubjectCode = subjectCode; document.getElementById('subject-hub-view').style.display = 'none'; document.getElementById('guide-slider-block').style.display = 'none';
+            document.getElementById('directory-view').style.display = 'block'; const titleMap = { phy: 'Physics Studio', chem: 'Chemistry Studio', bio: 'Biology Studio', math: 'Mathematics Studio' };
+            document.getElementById('directory-title-text').innerText = titleMap[subjectCode]; registerStatePushHistory('directory');
+        }
+
+        function closeSubjectDirectory() { selectedSubjectCode = ""; document.getElementById('directory-view').style.display = 'none'; document.getElementById('subject-hub-view').style.display = 'table'; document.getElementById('guide-slider-block').style.display = 'block'; }
+        function toggleChapterDropdown(element) { element.closest('.chapter-row').classList.toggle('active'); }
+
+        function refreshDirectoryUI() {
+            const targetList = document.getElementById('chapter-list-target'); targetList.innerHTML = "";
+            const chapters = window.latestCloudPayload[selectedSubjectCode] || [];
+            const isAdmin = (activeUser && activeUser.toUpperCase() === "PRATIM");
+            const admStyle = isAdmin ? 'style="display:inline-block;"' : ''; const admPanelDisplay = isAdmin ? 'display: flex;' : 'display: none; border:none; min-height:auto;';
+
+            chapters.forEach((chapter, index) => {
+                const row = document.createElement('div'); row.className = 'chapter-row';
+                const cNotes = chapter.notes || []; const dppModules = chapter.dppModules || []; const testModules = chapter.testModules || [];
+                const dppFiles = chapter.dppFiles || []; const testFiles = chapter.testFiles || [];
+                const chNumberLabel = String(index + 1).padStart(2, '0');
+
+                row.innerHTML = `
+                    <div class="chapter-trigger" onclick="toggleChapterDropdown(this)">
+                        <div>
+                            <span class="chapter-label">CH - ${chNumberLabel}</span>
+                            <div class="chapter-title-text">${chapter.title}</div>
+                            <div class="chapter-counters">Notes: ${cNotes.length} • DPPs: ${dppModules.length} • Tests: ${testModules.length}</div>
+                        </div>
+                        <div class="chapter-actions" onclick="event.stopPropagation();">
+                            <button class="btn-delete-chapter" ${admStyle} onclick="deleteChapterRow(${index})">🗑</button><span class="chevron-down">▼</span>
+                        </div>
+                    </div>
+                    <div class="chapter-content-pool">
+                        <div class="sub-slots-container">
+                            <div class="inner-bucket" id="notes-bucket-${index}">
+                                <div><h4>📚 Class Notes</h4><ul class="content-list" id="list-notes-${index}"></ul></div>
+                                <div class="admin-upload-panel" style="${admPanelDisplay}">
+                                    <button class="native-pdf-label" style="background:rgba(255,255,255,0.02); border-style:solid;" onclick="handleURLInputTrigger(${index}, 'notes')">🔗 Add Link</button>
+                                </div>
+                            </div>
+                            <div class="inner-bucket" id="dpps-bucket-${index}">
+                                <div><h4><span>🎯 Practice Boards (DPP)</span></h4><ul class="content-list" id="list-dpps-${index}"></ul><ul class="content-list" id="list-dppfiles-${index}" style="border-top:1px dashed var(--pw-border); padding-top:4px;"></ul></div>
+                                <div class="admin-upload-panel" style="${admPanelDisplay}"><button class="native-pdf-label" onclick="createNewQuizModuleSlot(${index}, 'dppModules')" style="background:rgba(99,102,241,0.2); border:1px solid var(--pw-accent);">➕ Add DPP Board</button></div>
+                            </div>
+                            <div class="inner-bucket" id="tests-bucket-${index}">
+                                <div><h4><span>🏆 Monthly Test Boards</span></h4><ul class="content-list" id="list-tests-${index}"></ul><ul class="content-list" id="list-testfiles-${index}" style="border-top:1px dashed var(--pw-border); padding-top:4px;"></ul></div>
+                                <div class="admin-upload-panel" style="${admPanelDisplay}"><button class="native-pdf-label" onclick="createNewQuizModuleSlot(${index}, 'testModules')" style="background:rgba(16,185,129,0.2); border:1px solid var(--pw-green); color:#34d399;">➕ Add Test Board</button></div>
+                            </div>
+                        </div>
+                    </div>`;
+                targetList.appendChild(row);
+                renderItemsList(cNotes, `list-notes-${index}`, index, 'notes');
+                renderItemsList(dppFiles, `list-dppfiles-${index}`, index, 'dppFiles');
+                renderItemsList(testFiles, `list-testfiles-${index}`, index, 'testFiles');
+                renderMultiQuizItems(dppModules, `list-dpps-${index}`, index, 'dppModules');
+                renderMultiQuizItems(testModules, `list-tests-${index}`, index, 'testModules');
+            });
+        }
+
+        function handleURLInputTrigger(chIndex, bucketKey) {
+            showCustomPrompt("Label Name", "Enter display label:", (label) => {
+                showCustomPrompt("Paste URL Link", "Paste path URL:", (linkUrl) => {
+                    let copy = JSON.parse(JSON.stringify(window.latestCloudPayload)); if(!copy[selectedSubjectCode][chIndex][bucketKey]) copy[selectedSubjectCode][chIndex][bucketKey] = [];
+                    copy[selectedSubjectCode][chIndex][bucketKey].push({ id: "file-" + Date.now(), name: label, data: linkUrl, type: 'link' });
+                    db.collection('curriculum').doc('nested_master_folders').set(copy);
+                });
+            });
+        }
+
+        function createNewQuizModuleSlot(chIndex, key) {
+            showCustomPrompt("Create Set", "Enter Board Title Name:", (title) => {
+                showCustomPrompt("Set Timer Limit", "Enter duration (in minutes):", (mins) => {
+                    let copy = JSON.parse(JSON.stringify(window.latestCloudPayload)); if (!copy[selectedSubjectCode][chIndex][key]) copy[selectedSubjectCode][chIndex][key] = [];
+                    copy[selectedSubjectCode][chIndex][key].push({ id: "mod-" + Date.now(), title: title, duration: parseInt(mins) || 0, questions: [] });
+                    db.collection('curriculum').doc('nested_master_folders').set(copy);
+                });
+            });
+        }
+
+        function openModuleLeaderboard(chIndex, moduleKey, modId) {
+            const container = document.getElementById('leaderboard-modal-content'); const modal = document.getElementById('leaderboard-overlay-modal');
+            const labelTitle = document.getElementById('leaderboard-modal-title'); const chapter = window.latestCloudPayload[selectedSubjectCode][chIndex];
+            const targetedMod = (chapter[moduleKey] || []).find(m => m.id === modId); if (!targetedMod) return;
+            labelTitle.innerText = `Leaderboard: ${targetedMod.title}`; container.innerHTML = "";
+            let performanceRows = []; const roster = window.globalCachedRosterSubmits || [];
+            roster.forEach(student => {
+                if (student.name.toUpperCase() === "PRATIM") return;
+                let score = 0;
+                (targetedMod.questions || []).forEach(q => {
+                    const uniqueKey = `${selectedSubjectCode}_${chIndex}_${modId}_${q.id}`;
+                    if (student.solvedQuestionsLog && student.solvedQuestionsLog[uniqueKey] === q.answer) score++;
+                });
+                performanceRows.push({ name: student.name, score: score, total: (targetedMod.questions || []).length });
+            });
+            performanceRows.sort((a,b) => b.score - a.score);
+            performanceRows.forEach(row => {
+                const item = document.createElement('div'); item.className = 'content-item';
+                item.innerHTML = `<span>👤 <strong>${row.name}</strong></span><span style="font-weight:700; color:var(--pw-green);">${row.score} / ${row.total} Solved</span>`;
+                container.appendChild(item);
+            });
+            registerStatePushHistory('leaderboard'); modal.style.display = 'flex';
+        }
+        function closeLeaderboardModal() { document.getElementById('leaderboard-overlay-modal').style.display = 'none'; }
+
+        function renderItemsList(arr, elementId, chIndex, bucketKey) {
+            const list = document.getElementById(elementId); if (!list || !arr) return;
+            const isAdmin = (activeUser && activeUser.toUpperCase() === "PRATIM"); list.innerHTML = "";
+            arr.forEach((item, itemIndex) => {
+                const li = document.createElement('li'); li.className = 'content-item';
+                let crossBtnHtml = isAdmin ? `<button class="btn-delete-item" style="display:inline-block;" onclick="deleteFileAsset(${chIndex}, '${bucketKey}', ${itemIndex})">✕</button>` : '';
+                li.innerHTML = `<span>📂 ${item.name}</span><div style="display:flex; gap:4px;">${crossBtnHtml}<button class="btn-view" onclick="launchViewer(${chIndex}, '${bucketKey}', ${itemIndex})">Open</button></div>`;
+                list.appendChild(li);
+            });
+        }
+
+        function renderMultiQuizItems(modulesArr, elementId, chIndex, bucketKey) {
+            const list = document.getElementById(elementId); if (!list) return; list.innerHTML = "";
+            modulesArr.forEach((mod, modIdx) => {
+                const li = document.createElement('li'); li.className = 'content-item'; li.style.flexDirection = 'column'; li.style.alignItems = 'stretch';
+                li.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><span>🎯 ${mod.title}</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;"><small style="color:var(--neon-blue);">⏱️ ${mod.duration}m</small><div style="display:flex; gap:4px;"><button class="btn-view" style="background:transparent;" onclick="openModuleLeaderboard(${chIndex}, '${bucketKey}', '${mod.id}')">📊 Rank</button><button class="btn-view" onclick="launchQuizWorkspace(${chIndex}, '${bucketKey}', '${mod.id}')">Open</button></div></div>`;
+                list.appendChild(li);
+            });
+        }
+
+        function handleCreateChapterClick() {
+            showCustomPrompt("New Chapter", "Enter title:", (title) => {
+                let copy = JSON.parse(JSON.stringify(window.latestCloudPayload)); if (!copy[selectedSubjectCode]) copy[selectedSubjectCode] = [];
+                copy[selectedSubjectCode].push({ title: title, notes: [], dppModules: [], testModules: [], dppFiles: [], testFiles: [] });
+                db.collection('curriculum').doc('nested_master_folders').set(copy);
+            });
+        }
+        function deleteChapterRow(index) { showCustomConfirm("Delete?", "Remove chapter?", () => { let copy = JSON.parse(JSON.stringify(window.latestCloudPayload)); copy[selectedSubjectCode].splice(index, 1); db.collection('curriculum').doc('nested_master_folders').set(copy); }); }
+        function deleteFileAsset(chIndex, bucketKey, itemIndex) { let copy = JSON.parse(JSON.stringify(window.latestCloudPayload)); copy[selectedSubjectCode][chIndex][bucketKey].splice(itemIndex, 1); db.collection('curriculum').doc('nested_master_folders').set(copy); }
+
+        function launchViewer(chIndex, bucketKey, itemIndex) {
+            const item = window.latestCloudPayload[selectedSubjectCode][chIndex][bucketKey][itemIndex];
+            window.open(item.data, '_blank');
+        }
+        function closeViewer() { document.getElementById('viewer-modal').style.display = 'none'; }
+
+        function launchQuizWorkspace(chIndex, bucketKey, modId) {
+            targetQuizChapterIndex = chIndex; targetQuizBucketKey = bucketKey; targetQuizModuleId = modId;
+            const chapterConfig = window.latestCloudPayload[selectedSubjectCode][chIndex];
+            const targetedMod = (chapterConfig[bucketKey] || []).find(m => m.id === modId); if(!targetedMod) return;
+
+            document.getElementById('quiz-portal-title').innerText = targetedMod.title;
+            renderQuizQuestionsList(); document.getElementById('quiz-portal-modal').style.display = 'flex'; registerStatePushHistory('quiz');
+
+            if (activeUser.toUpperCase() !== "PRATIM" && targetedMod.duration > 0) { integrateProGuardExamTimer(targetedMod.duration); }
+        }
+
+        function integrateProGuardExamTimer(minutes) {
+            clearInterval(proGuardCountdownInterval); examActiveState = true; timeRemainingSeconds = minutes * 60;
+            document.getElementById('security-timer-banner').style.display = 'block';
+            proGuardCountdownInterval = setInterval(() => {
+                timeRemainingSeconds--;
+                if (timeRemainingSeconds <= 0) { executeProGuardAutomaticLockout(); } 
+                else {
+                    const min = String(Math.floor(timeRemainingSeconds / 60)).padStart(2, '0'); const sec = String(timeRemainingSeconds % 60).padStart(2, '0');
+                    document.getElementById('timer-countdown-clock').innerText = `${min}:${sec}`;
+                }
+            }, 1000);
+        }
+
+        function setupProGuardTabProtection() {
+            document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && examActiveState && activeUser.toUpperCase() !== "PRATIM") executeProGuardAutomaticLockout(); });
+        }
+        function executeProGuardAutomaticLockout() { clearInterval(proGuardCountdownInterval); examActiveState = false; document.getElementById('quiz-portal-modal').style.display = 'none'; showCustomAlert("🚨 Locked Out", "Test window locked."); }
+        function closeQuizPortal() { clearInterval(proGuardCountdownInterval); examActiveState = false; document.getElementById('quiz-portal-modal').style.display = 'none'; }
+
+        function renderQuizQuestionsList() {
+            const targetContainer = document.getElementById('quiz-questions-loader-target'); targetContainer.innerHTML = "";
+            const chapterConfig = window.latestCloudPayload[selectedSubjectCode][targetQuizChapterIndex];
+            const targetedMod = (chapterConfig[targetQuizBucketKey] || []).find(m => m.id === targetQuizModuleId);
+            if(!targetedMod || !targetedMod.questions || targetedMod.questions.length === 0) return;
+            targetedMod.questions.forEach((q, qIndex) => {
+                const card = document.createElement('div'); card.className = "question-card";
+                card.innerHTML = `<p style="font-weight:700;">Q${qIndex + 1}: ${q.stem}</p>
+                    <div class="options-grid">
+                        <button class="option-button" onclick="evaluateOptionSelection(${qIndex}, 'A', '${q.id}')"><strong>A:</strong> ${q.a}</button>
+                        <button class="option-button" onclick="evaluateOptionSelection(${qIndex}, 'B', '${q.id}')"><strong>B:</strong> ${q.b}</button>
+                        <button class="option-button" onclick="evaluateOptionSelection(${qIndex}, 'C', '${q.id}')"><strong>C:</strong> ${q.c}</button>
+                        <button class="option-button" onclick="evaluateOptionSelection(${qIndex}, 'D', '${q.id}')"><strong>D:</strong> ${q.d}</button>
+                    </div>`;
+                targetContainer.appendChild(card);
+            });
+        }
+
+        function evaluateOptionSelection(qIndex, selectedToken, questionId) {
+            const uniqueKey = `${selectedSubjectCode}_${targetQuizChapterIndex}_${targetQuizModuleId}_${questionId}`;
+            if (solvedQuestionsLog[uniqueKey]) return; solvedQuestionsLog[uniqueKey] = selectedToken;
+            db.collection('students').doc(activeUser.toUpperCase()).update({ solvedQuestionsLog: solvedQuestionsLog }).then(() => { spawnNotificationToast("Answer Staged!"); });
+        }
+
+        function setupHardwareBackButtonEngine() {
+            window.history.replaceState({ viewState: 'home' }, '');
+            window.addEventListener('popstate', (event) => {
+                if (examActiveState) { window.history.pushState({ viewState: 'quiz' }, ''); return; }
+                if (document.getElementById('prai-chat-drawer').style.display === 'flex') { togglePraiChatDrawer(); return; }
+                if (document.getElementById('quiz-portal-modal').style.display === 'flex') { closeQuizPortal(); return; }
+                if (document.getElementById('leaderboard-overlay-modal').style.display === 'flex') { closeLeaderboardModal(); return; }
+                if (selectedSubjectCode !== "") { closeSubjectDirectory(); return; }
+            });
+        }
+        function registerStatePushHistory(labelToken) { window.history.pushState({ viewState: labelToken }, ''); }
+
+        /* --- 4 SEC / 10 MINS SPEECH BUBBLE INTERACTION SYSTEM --- */
+        function triggerSpeechBubbleFlash() {
+            const bubble = document.getElementById('prai-speech-popup-bubble');
+            const drawer = document.getElementById('prai-chat-drawer');
+            if (drawer.style.display !== 'flex') {
+                bubble.classList.remove('hidden-pop');
+                setTimeout(() => { bubble.classList.add('hidden-pop'); }, 4000);
+            }
+        }
+
+        function setupAutomaticSpeechBubbleLoop() {
+            setTimeout(triggerSpeechBubbleFlash, 1500);
+            setInterval(triggerSpeechBubbleFlash, 600000);
+        }
+
+        /* --- UPGRADED STANDARD POST-REQUEST AI CLUSTER HANDSHAKE ENGINE --- */
+        async function fetchAIResponseFromCluster(userPrompt) {
+            try {
+                const contextRule = "You are PR(AI) Core Hub, an elite AI learning assistant operating exactly like the premium PW AI Guru. Your absolute job is to break down student doubts in Physics, Chemistry, Biology, and Mathematics. You are fully serious and dedicated to study blocks; do not make jokes, do not play around, and avoid casual chit-chat. Always address the student warmly with 'Hello Bacchoo!'. Break down every single concept step-by-step using bold headings and bullet points. Keep explanations encouraging and super simple so a 9th/10th grade student can easily understand and score full marks!";
+                
+                // Using a standardized stable POST data layout stream to eliminate drop errors completely
+                const response = await fetch("https://text.pollinations.ai/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "system", content: contextRule },
+                            { role: "user", content: userPrompt }
+                        ],
+                        model: "searchgpt"
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Network response validation variance");
+                }
+
+                const generatedAnswer = await response.text();
+                
+                if (generatedAnswer && generatedAnswer.trim().length > 0) {
+                    return generatedAnswer.trim();
+                }
+                
+                return "Hello Bacchoo! The core intelligence network experienced a minor drop. Let's try that question again, we will master it! 🔥";
+            } catch (err) {
+                console.error("AI Sync Error: ", err);
+                return "Hello Bacchoo! Connection sync drop. Let me reset my loops. Ask your question again and let's destroy this doubt! 🚀";
+            }
+        }
+
+        function togglePraiChatDrawer() {
+            const block = document.getElementById('prai-chat-drawer');
+            const bubble = document.getElementById('prai-speech-popup-bubble');
+            if (block.style.display === 'flex') {
+                block.classList.add('hide');
+                setTimeout(() => { block.style.display = 'none'; block.classList.remove('hide'); bubble.classList.remove('hidden-pop'); }, 240);
+            } else {
+                block.style.display = 'flex'; bubble.classList.add('hidden-pop'); registerStatePushHistory('praiAI');
+                const feed = document.getElementById('prai-msg-feed-target'); feed.scrollTop = feed.scrollHeight;
+            }
+        }
+
+        function animateAiTextResponse(containerElement, baseString) {
+            isTypingActive = true;
+            let currentStrIdx = 0;
+            containerElement.innerText = "";
+            containerElement.classList.add('typing-cursor');
+            
+            const feed = document.getElementById('prai-msg-feed-target');
+
+            function injectionLoop() {
+                if (currentStrIdx < baseString.length) {
+                    containerElement.innerText += baseString.charAt(currentStrIdx);
+                    currentStrIdx++;
+                    feed.scrollTop = feed.scrollHeight;
+                    setTimeout(injectionLoop, Math.random() * 12 + 6); // Fluid hyper-motion delivery
+                } else {
+                    containerElement.classList.remove('typing-cursor');
+                    isTypingActive = false;
+                }
+            }
+            injectionLoop();
+        }
+
+        async function dispatchPraiUserMessage() {
+            if (isTypingActive) return; 
+
+            const inputField = document.getElementById('prai-input-box');
+            const query = inputField.value.trim(); if (!query) return;
+
+            const feed = document.getElementById('prai-msg-feed-target');
+            const userBubble = document.createElement('div'); userBubble.className = "prai-msg user";
+            userBubble.innerText = query; feed.appendChild(userBubble);
+            inputField.value = ""; feed.scrollTop = feed.scrollHeight;
+
+            // Generate thinking indicator bubble
+            const praiBubble = document.createElement('div'); praiBubble.className = "prai-msg ai typing-cursor";
+            praiBubble.innerText = "Analyzing question arrays... Preparing breakdown... ⚡"; feed.appendChild(praiBubble);
+            feed.scrollTop = feed.scrollHeight;
+
+            // Handshake operation with the cloud processing cluster
+            const generatedAnswer = await fetchAIResponseFromCluster(query);
+            praiBubble.innerText = ""; 
+            
+            animateAiTextResponse(praiBubble, generatedAnswer);
+        }
+    </script>
+</body>
+</html>
